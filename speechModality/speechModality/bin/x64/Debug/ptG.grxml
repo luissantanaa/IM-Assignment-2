@@ -1,0 +1,59 @@
+﻿<?xml version="1.0"?>
+<!--<grammar xml:lang="pt-PT" version="1.0" xmlns="http://www.w3.org/2001/06/grammar" tag-format="semantics/1.0">
+	<rule id="rootRule" scope="public">
+	  <item>
+		  <item>
+			<ruleref uri="#object"/>
+			<tag>out.shape=rules.latest();</tag>
+		  </item>
+		  <item>
+			<ruleref uri="#color"/>
+			<tag>out.color=rules.latest();</tag>
+		  </item>
+	  </item>
+	</rule>
+	<rule id="object">
+	  <one-of>
+		<item>quadrado<tag>out="SQUARE"</tag></item>
+		<item>círculo<tag>out="CIRCLE"</tag></item>
+		<item>triângulo<tag>out="TRIANGLE"</tag></item>
+	  </one-of>
+	</rule>
+	<rule id="color">
+	  <one-of>
+		<item>verde<tag>out="GREEN"</tag></item>
+		<item>azul<tag>out="BLUE"</tag></item>
+		<item>vermelho<tag>out="RED"</tag></item>
+	  </one-of>
+	</rule>
+</grammar>-->
+
+<grammar xml:lang="pt-PT" version="1.0" xmlns="http://www.w3.org/2001/06/grammar" tag-format="semantics/1.0">
+	<rule id="rootRule" scope="public">
+		<item>
+			<item>
+				<ruleref uri="#wake"/>
+				<tag>out.wakeUp=rules.latest();</tag>
+			 </item>
+			 <item>
+				<ruleref uri="#command"/>
+				<tag>out.command=rules.latest();</tag>
+			 </item>
+		</item>
+	</rule>
+	<rule id="wake">
+			<one-of>
+			<item repeat="0-1">Powerpoint<tag>out="ppt"</tag></item>
+			</one-of>
+	</rule>
+	<rule id="command">
+		<one-of>
+				<item repeat="0-1">Avançar Slide<tag>out="avn"</tag></item>
+				<item repeat="0-1">Proximo Slide<tag>out="avn"</tag></item>
+		</one-of>
+		<one-of>
+				<item repeat="0-1">Recuar Slide<tag>out="rec"</tag></item>
+				<item repeat="0-1">Slide Anterior<tag>out="rec"</tag></item>
+		</one-of>
+	</rule>
+</grammar>
