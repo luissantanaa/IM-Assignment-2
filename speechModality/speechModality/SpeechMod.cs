@@ -12,6 +12,8 @@ namespace speechModality
     {
         private SpeechRecognitionEngine sre;
         private Grammar gr;
+        Tts tts = new Tts();
+
         public event EventHandler<SpeechEventArg> Recognized;
         protected virtual void onRecognized(SpeechEventArg msg)
         {
@@ -33,7 +35,7 @@ namespace speechModality
             mmic = new MmiCommunication("localhost", 8000, "User1", "ASR"); // MmiCommunication(string IMhost, int portIM, string UserOD, string thisModalityName)
 
             mmic.Send(lce.NewContextRequest());
-
+            
             //load pt recognizer
             sre = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("pt-PT"));
             gr = new Grammar(Environment.CurrentDirectory + "\\ptG.grxml", "rootRule");
@@ -68,6 +70,27 @@ namespace speechModality
 
             var exNot = lce.ExtensionNotification(e.Result.Audio.StartTime+"", e.Result.Audio.StartTime.Add(e.Result.Audio.Duration)+"",e.Result.Confidence, json);
             mmic.Send(exNot);
+
+
+            Console.WriteLine((e.Result.Semantics["command"].Value.ToString()) == "");
+            
+            
+
+
+            switch (e.Result.Semantics["command"].Value.ToString()){
+                case "avn":
+                    tts.Speak("Avançar Slide");
+                    break;
+                
+                case "rec":
+                    tts.Speak("Recuar Slide");
+                    break;
+                
+                case "ppt":
+                    tts.Speak("Sim?");
+                    break;
+            }
+
         }
     }
 }
