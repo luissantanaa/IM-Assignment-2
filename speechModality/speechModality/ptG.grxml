@@ -46,7 +46,10 @@
 			<item repeat="0-1">Powerpoint<tag>out="ppt"</tag></item>
 			</one-of>
 	</rule>
-	<rule id="command">
+  <rule id="command">
+		<one-of>
+      <item repeat="0-1">Abrir<tag>out="abr"</tag></item>
+    </one-of>
 		<one-of>
 				<item repeat="0-1">Avançar Slide<tag>out="avn"</tag></item>
 				<item repeat="0-1">Proximo Slide<tag>out="avn"</tag></item>
@@ -54,6 +57,10 @@
 		<one-of>
 				<item repeat="0-1">Recuar Slide<tag>out="rec"</tag></item>
 				<item repeat="0-1">Slide Anterior<tag>out="rec"</tag></item>
+		</one-of>
+		<one-of>
+				<item repeat="0-1">Adicionar Slide<tag>out="adi"</tag></item>
+				<item repeat="0-1">Criar Slide<tag>out="adi"</tag></item>
 		</one-of>
 	</rule>
 </grammar>
