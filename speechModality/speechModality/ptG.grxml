@@ -46,21 +46,199 @@
 			<item repeat="0-1">Powerpoint<tag>out="ppt"</tag></item>
 			</one-of>
 	</rule>
-  <rule id="command">
+  	<rule id="command">
 		<one-of>
-      <item repeat="0-1">Abrir<tag>out="abr"</tag></item>
-    </one-of>
-		<one-of>
-				<item repeat="0-1">Avançar Slide<tag>out="avn"</tag></item>
-				<item repeat="0-1">Proximo Slide<tag>out="avn"</tag></item>
+			<item>
+				<item>
+					<one-of>
+						<item>entrar em</item>
+						<item>modo de</item>
+						<item>entrar em modo de</item>
+						<item>começar</item>
+						<item>iniciar</item>
+					</one-of>
+				</item>
+				<item repeat="0-1">apresentação<tag>out="aprest"</tag></item>
+			</item>	
+			<item>
+				<item>
+					<one-of>
+						<item>definir limite</item>
+						<item>definir limite de</item>
+						<item>limite</item>
+						<item>limite de</item>
+						<item>limitar a</item>
+						<item>limitar</item>
+					</one-of>
+				</item>
+				<item>
+					<ruleref uri="#number"/>
+					<tag>out.number=rules.latest();</tag>
+				</item>
+				<item>
+					<one-of>
+						<item>minuto<tag>out="lim"</tag></item>
+						<item>minutos<tag>out="lim"</tag></item>
+						<item>hora<tag>out="lim"</tag></item>
+						<item>horas<tag>out="lim"</tag></item>
+					</one-of>
+				</item>
+			</item>
+				
+			<item>
+				<one-of>
+					<item>
+						<item>
+							<one-of>
+								<item>avançar</item>
+								<item>avança</item>
+							</one-of>
+							<item repeat="0-1">para</item>
+						</item>
+						<item repeat="0-1">
+							<item repeat="0-1">o</item>
+							<one-of>
+								<item>próximo</item>
+								<item>seguinte</item>
+							</one-of>
+						</item>
+					</item>
+					<item>
+						<item>
+							<one-of>
+								<item>recuar</item>
+								<item>recua</item>
+								<item>volta atras</item>
+							</one-of>
+							<item repeat="0-1">para</item>
+						</item>
+						<item repeat="0-1">
+							<item repeat="0-1">o</item>
+							<one-of>
+								<item>
+									<item repeat="0-1">
+										<one-of>
+											<item>slide</item>
+											<item>diapositivo</item>
+										</one-of>
+									</item>
+									<item>anterior</item>
+								</item>
+								<item>passado</item>
+							</one-of>
+						</item>
+					</item>
+				</one-of>
+		        <item repeat="0-1">
+					<one-of>
+						<item>slide</item>
+						<item>diapositivo</item>
+					</one-of>
+				</item>
+			</item>
+			
+    		<item>
+				<item>
+					<one-of>
+						<item>ir</item>
+						<item>salta</item>
+						<item>saltar</item>
+					</one-of>
+					<item repeat="0-1">para</item>
+					<item repeat="0-1">o</item>
+				</item>
+		        <item repeat="0-1">
+					<one-of>
+						<item>slide</item>
+						<item>diapositivo</item>
+					</one-of>
+				</item>
+				<item>
+					<ruleref uri="#number"/>
+				</item>
+			</item>
+
+			<item>
+				<item>
+					<one-of>
+						<item>lê</item>
+						<item>ler</item>
+					</one-of>	
+					<item>notas</item>
+				</item>
+				<item repeat="0-1">
+					<one-of>
+						<item>relativas ao</item>
+						<item>relativas</item>
+						<item>do</item>
+					</one-of>
+				</item>
+				<item repeat="0-1">
+					<one-of>
+						<item>slide</item>
+						<item>diapositivo</item>
+					</one-of>
+				</item>
+				<item repeat="0-1">numero</item>
+				<item repeat="0-1">
+					<ruleref uri="#number"/>
+				</item>
+			</item>
+
+			<item>
+				<item>
+					<one-of>
+						<item>acabar</item>
+						<item>acabar a</item>
+						<item>
+							<item>sair</item>
+							<item repeat="0-1">
+								<one-of>
+									<item>do modo de</item>
+									<item>da</item>
+									<item>do</item>
+								</one-of>	
+							</item>
+						</item>
+					</one-of>
+				</item>
+				<item>apresentação</item>
+			</item>
 		</one-of>
+	</rule>
+	
+	<rule id="number">
 		<one-of>
-				<item repeat="0-1">Recuar Slide<tag>out="rec"</tag></item>
-				<item repeat="0-1">Slide Anterior<tag>out="rec"</tag></item>
-		</one-of>
-		<one-of>
-				<item repeat="0-1">Adicionar Slide<tag>out="adi"</tag></item>
-				<item repeat="0-1">Criar Slide<tag>out="adi"</tag></item>
+			<item>
+				<one-of>
+					<item>um<tag> out = 1; </tag></item>
+					<item>uma<tag> out = 1; </tag></item>
+				</one-of>
+			</item>
+			<item>
+				<one-of>
+					<item>dois<tag> out = 2; </tag></item>
+					<item>duas<tag> out = 2; </tag></item>
+				</one-of>
+			</item>
+			<item>três<tag> out = 3; </tag></item>
+			<item>quatro<tag> out = 4; </tag></item>
+			<item>cinco<tag> out = 5; </tag></item>
+			<item>seis<tag> out = 6; </tag></item>
+			<item>sete<tag> out = 7; </tag></item>
+			<item>oito<tag> out = 8; </tag></item>
+			<item>nove<tag> out = 9; </tag></item>
+			<item>dez<tag> out = 10; </tag></item>
+			<item>onze<tag> out = 11; </tag></item>
+			<item>doze<tag> out = 12; </tag></item>
+			<item>treze<tag> out = 13; </tag></item>
+			<item>quatorze<tag> out = 14; </tag></item>
+			<item>quinze<tag> out = 15; </tag></item>
+			<item>dezesseis<tag> out = 16; </tag></item>
+			<item>dezessete<tag> out = 17; </tag></item>
+			<item>dezoito<tag> out = 18; </tag></item>
+			<item>dezenove<tag> out = 19; </tag></item>
+			<item>vinte<tag> out = 19; </tag></item>
 		</one-of>
 	</rule>
 </grammar>
