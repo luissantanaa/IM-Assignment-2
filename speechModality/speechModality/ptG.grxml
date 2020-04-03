@@ -49,18 +49,35 @@
   	<rule id="command">
 		<one-of>
 			<item>
+        <item repeat="0-1">abrir<tag>out="abr"</tag></item>
+      </item>
+      
+     <item><tag>out="aprest"</tag>
 				<item>
 					<one-of>
-						<item>entrar em</item>
+						<item>entrar em</item>                                                  
 						<item>modo de</item>
 						<item>entrar em modo de</item>
 						<item>começar</item>
 						<item>iniciar</item>
 					</one-of>
 				</item>
-				<item repeat="0-1">apresentação<tag>out="aprest"</tag></item>
-			</item>	
-			<item>
+				<item repeat="0-1">apresentação</item>
+			</item>
+
+      <item><tag>out="nAprest"</tag>
+        <item>
+          <one-of>
+            <item>sair da</item>
+            <item>sair do modo de</item>
+            <item>sair</item>
+          </one-of>
+        </item>
+        <item repeat="0-1">apresentação
+        </item>
+      </item>
+
+      <item>
 				<item>
 					<one-of>
 						<item>definir limite</item>
@@ -71,11 +88,13 @@
 						<item>limitar</item>
 					</one-of>
 				</item>
+				
 				<item>
 					<ruleref uri="#number"/>
 					<tag>out.number=rules.latest();</tag>
 				</item>
-				<item>
+				
+        <item>
 					<one-of>
 						<item>minuto<tag>out="lim"</tag></item>
 						<item>minutos<tag>out="lim"</tag></item>
@@ -88,7 +107,7 @@
 			<item>
 				<one-of>
 					<item>
-						<item>
+						<item><tag>out="avn"</tag>
 							<one-of>
 								<item>avançar</item>
 								<item>avança</item>
@@ -103,15 +122,15 @@
 							</one-of>
 						</item>
 					</item>
-					<item>
-						<item>
+          <item>
+						<item> <tag>out="rec"</tag>
 							<one-of>
 								<item>recuar</item>
 								<item>recua</item>
 								<item>volta atras</item>
 							</one-of>
 							<item repeat="0-1">para</item>
-						</item>
+					  </item>
 						<item repeat="0-1">
 							<item repeat="0-1">o</item>
 							<one-of>
@@ -128,8 +147,8 @@
 							</one-of>
 						</item>
 					</item>
-				</one-of>
-		        <item repeat="0-1">
+        </one-of>  
+        <item repeat="0-1">
 					<one-of>
 						<item>slide</item>
 						<item>diapositivo</item>
@@ -137,7 +156,24 @@
 				</item>
 			</item>
 			
-    		<item>
+      <item>
+				<item><tag>out="adi"</tag>
+					<one-of>
+						<item>cria</item>
+						<item>adicionar</item>
+						<item>adiciona</item>
+					</one-of>
+					<item repeat="0-1">um</item>
+				</item>
+		    <item repeat="0-1">
+					<one-of>
+						<item>slide</item>
+						<item>diapositivo</item>
+					</one-of>
+				</item>
+			</item>
+      
+    	<item>
 				<item>
 					<one-of>
 						<item>ir</item>
@@ -147,7 +183,7 @@
 					<item repeat="0-1">para</item>
 					<item repeat="0-1">o</item>
 				</item>
-		        <item repeat="0-1">
+		    <item repeat="0-1">
 					<one-of>
 						<item>slide</item>
 						<item>diapositivo</item>
@@ -238,7 +274,7 @@
 			<item>dezessete<tag> out = 17; </tag></item>
 			<item>dezoito<tag> out = 18; </tag></item>
 			<item>dezenove<tag> out = 19; </tag></item>
-			<item>vinte<tag> out = 19; </tag></item>
+			<item>vinte<tag> out = 20; </tag></item>
 		</one-of>
 	</rule>
 </grammar>

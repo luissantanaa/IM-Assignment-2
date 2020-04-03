@@ -19,9 +19,11 @@ namespace speechModality
         private Tts tts = new Tts();
         private Microsoft.Office.Interop.PowerPoint.Application PPTAPP = new Microsoft.Office.Interop.PowerPoint.Application();
         private Presentation pptPresentation;
+        private Slides slides;
         private Boolean WOKE = false;
         private Boolean OPENED = false;
-        private int index = 0;
+        private int index = 1;
+        private SlideShowView objSlideShowView;
 
         public event EventHandler<SpeechEventArg> Recognized;
         protected virtual void onRecognized(SpeechEventArg msg)
@@ -96,37 +98,64 @@ namespace speechModality
                 {
                     switch (command)
                     {
+                        case "nAprest":
+                            if (!(PPTAPP.SlideShowWindows.Count > 0))
+                            {
+                                tts.Speak("De momento não esta no modo de apresentação");
+                            }
+                            else
+                            {
+                                objSlideShowView.Exit();
+                            }
+                            break;
+                        case "aprest":
+                            if (slides.Count.Equals(0))
+                            {
+                                tts.Speak("A apresentação tem que ter pelo menos um slide");
+                            }
+                            else
+                            {
+                                pptPresentation.SlideShowSettings.ShowPresenterView = MsoTriState.msoFalse;
+                                pptPresentation.SlideShowSettings.Run();
+                                objSlideShowView = pptPresentation.SlideShowWindow.View;
+                                objSlideShowView.Application.SlideShowWindows[1].Activate();
+                            }
+
+                            break;
+
                         case "avn":
+                            //pptPresentation.SlideShowSettings.ShowPresenterView = MsoTriState.msoFalse;
+                            ////Run the presentation
+                            //pptPresentation.SlideShowSettings.Run();
+                            ////Hold a reference to the SlideShowWindow
+                            //SlideShowView objSlideShowView = pptPresentation.SlideShowWindow.View;
+                            //objSlideShowView.Application.SlideShowWindows[1].Activate();
+                            //objSlideShowView.Next();
+                            slides = pptPresentation.Slides;
                             try
                             {
-                                SlideShowWindow slideshow = pptPresentation.SlideShowWindow;
-                                Console.WriteLine(pptPresentation.Slides.Count);
-                                if (index + 1 > pptPresentation.Slides.Count)
-                                {
-                                    index++;
-                                    slideshow.View.GotoSlide(index);
-                                }
-
+                                index++;
+                                slides[index].Select();
                             }
-                            catch (System.Runtime.InteropServices.COMException)
+                            catch
                             {
-                                tts.Speak("A apresentação não tem mais slides");
+                                index--;
+                                tts.Speak("Desculpe, não é possivel avançar para o diapositivo seguinte");
                             }
+                            
                             break;
 
                         case "rec":
+                            slides = pptPresentation.Slides;
                             try
                             {
-                                SlideShowWindow slideshow = pptPresentation.SlideShowWindow;
-                                ID = slideshow.View.Slide.SlideID;
-                                if (ID > 0)
-                                {
-                                    pptPresentation.Slides.FindBySlideID((ID - 1));
-                                }
+                                index--;
+                                slides[index].Select();
                             }
-                            catch (System.Runtime.InteropServices.COMException)
+                            catch
                             {
-                                tts.Speak("A apresentação não tem mais slides");
+                                index++;
+                                tts.Speak("Desculpe, não é possivel recuar para o diapositivo anterior");
                             }
                             break;
 
@@ -144,7 +173,7 @@ namespace speechModality
                             break;
 
                         case "adi":
-                            Slides slides = pptPresentation.Slides;
+                            slides = pptPresentation.Slides;
                             slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
                             break;
                     }
@@ -175,41 +204,103 @@ namespace speechModality
                 {
                     if (!wake.Equals("") && !command.Equals(""))
                     {
-                        switch (command)
-                        {
-                            case "avn":
+                        switch (command){ 
+
+                            case "abr":
                                 try
                                 {
-                                    Console.WriteLine(index);
-                                    
-                                    pptPresentation.SlideShowWindow.View.GotoSlide(index + 1);
-                                    index++;
+                                    OPENED = true;
+                                    PPTAPP.Visible = MsoTriState.msoTrue;
+                                    Presentations ppPresens = PPTAPP.Presentations;
+                                    pptPresentation = ppPresens.Open("temp", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
                                 }
-                                catch
+                                catch (System.IO.FileNotFoundException)
                                 {
-                                    tts.Speak("A apresentação não tem mais slides");
+                                    pptPresentation = PPTAPP.Presentations.Add(MsoTriState.msoTrue);
                                 }
                                 break;
 
-                            case "rec":
+                            default:
+                                tts.Speak("Por favor use o comando 'Powerpoint abrir' para iniciar a aplicação");
+                                break;
+                            //case "adi":
+                            //    Slides slides = pptPresentation.Slides;
+                            //    slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
+                            //    break;
+                        }
+                    }
+
+                    if (wake.Equals("ppt") && command.Equals(""))
+                    {
+                        tts.Speak("Sim?");
+                        WOKE = true;
+                    }
+                }
+                else
+                {
+                    if (!wake.Equals("") && !command.Equals(""))
+                    {
+                        switch (command)
+                        {
+
+                            case "nAprest":
+                                if (!(PPTAPP.SlideShowWindows.Count > 0)) {
+                                    tts.Speak("De momento não esta no modo de apresentação");
+                                }
+                                else
+                                {
+                                    objSlideShowView.Exit();
+                                }
+                                break;
+                            case "aprest":
+                                if (slides == null)
+                                {
+                                    tts.Speak("A apresentação tem que ter pelo menos um slide");
+                                }
+                                else
+                                {
+                                    pptPresentation.SlideShowSettings.ShowPresenterView = MsoTriState.msoFalse;
+                                    pptPresentation.SlideShowSettings.Run();
+                                    objSlideShowView = pptPresentation.SlideShowWindow.View;
+                                    objSlideShowView.Application.SlideShowWindows[1].Activate();
+                                }
+                               
+                                break;
+
+                            case "avn":
+                               
+                                slides = pptPresentation.Slides;
                                 try
                                 {
-                                    SlideShowWindow slideshow = pptPresentation.SlideShowWindow;
-                                    ID = slideshow.View.Slide.SlideID;
-                                    if (ID > 0)
-                                    {
-                                        pptPresentation.Slides.FindBySlideID((ID - 1));
-                                    }
+                                    index++;
+                                    slides[index].Select();
                                 }
-                                catch (System.Runtime.InteropServices.COMException)
+                                catch
                                 {
-                                    tts.Speak("A apresentação não tem mais slides");
+                                    index--;
+                                    tts.Speak("Desculpe, não é possivel avançar para o diapositivo seguinte");
+                                }
+
+                                break;
+
+                            case "rec":
+                                slides = pptPresentation.Slides;
+                                try
+                                {
+                                    index--;
+                                    slides[index].Select();
+                                }
+                                catch
+                                {
+                                    index++;
+                                    tts.Speak("Desculpe, não é possivel recuar para o diapositivo anterior");
                                 }
                                 break;
 
                             case "abr":
                                 try
                                 {
+                                    OPENED = true;
                                     PPTAPP.Visible = MsoTriState.msoTrue;
                                     Presentations ppPresens = PPTAPP.Presentations;
                                     pptPresentation = ppPresens.Open("temp", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
@@ -221,16 +312,15 @@ namespace speechModality
                                 break;
 
                             case "adi":
-                                Slides slides = pptPresentation.Slides;
+                                slides = pptPresentation.Slides;
                                 slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
                                 break;
-                        }
-                    }
 
-                    if (wake.Equals("ppt") && command.Equals(""))
-                    {
-                        tts.Speak("Sim?");
-                        WOKE = true;
+                            default:
+                                tts.Speak("Por favor use o comando 'Powerpoint abrir' para iniciar a aplicação");
+                                break;
+
+                        }
                     }
                 }
             }
