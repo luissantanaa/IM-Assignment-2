@@ -65,6 +65,18 @@
 				<item repeat="0-1">apresentação</item>
 			</item>
 
+      <item>
+        <item>
+          <one-of>
+            <item>guardar<tag>out="grdrppt"</tag></item>
+            <item>salvar<tag>out="grdrppt"</tag></item>
+            <item>gravar<tag>out="grdrppt"</tag></item>
+          </one-of>
+        </item>
+        <item repeat="0-1">em powerpoint<tag>out="grdrppt"</tag></item>
+        <item repeat="0-1">em pdf<tag>out="grdrpdf"</tag></item>
+      </item>
+      
       <item><tag>out="nAprest"</tag>
         <item>
           <one-of>
@@ -172,6 +184,25 @@
 					</one-of>
 				</item>
 			</item>
+
+      <item>
+        <item>
+          <tag>out="rem"</tag>
+          <one-of>
+            <item>apaga</item>
+            <item>apagar</item>
+            <item>remove</item>
+            <item>remover</item>
+          </one-of>
+          <item repeat="0-1">um</item>
+        </item>
+        <item repeat="0-1">
+          <one-of>
+            <item>slide</item>
+            <item>diapositivo</item>
+          </one-of>
+        </item>
+      </item>
       
     	<item>
 				<item>

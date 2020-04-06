@@ -99,6 +99,7 @@ namespace speechModality
                     switch (command)
                     {
                         case "nAprest":
+                            
                             if (!(PPTAPP.SlideShowWindows.Count > 0))
                             {
                                 tts.Speak("De momento não esta no modo de apresentação");
@@ -109,6 +110,7 @@ namespace speechModality
                             }
                             break;
                         case "aprest":
+                            
                             if (slides.Count.Equals(0))
                             {
                                 tts.Speak("A apresentação tem que ter pelo menos um slide");
@@ -124,13 +126,7 @@ namespace speechModality
                             break;
 
                         case "avn":
-                            //pptPresentation.SlideShowSettings.ShowPresenterView = MsoTriState.msoFalse;
-                            ////Run the presentation
-                            //pptPresentation.SlideShowSettings.Run();
-                            ////Hold a reference to the SlideShowWindow
-                            //SlideShowView objSlideShowView = pptPresentation.SlideShowWindow.View;
-                            //objSlideShowView.Application.SlideShowWindows[1].Activate();
-                            //objSlideShowView.Next();
+                           
                             slides = pptPresentation.Slides;
                             try
                             {
@@ -175,6 +171,20 @@ namespace speechModality
                         case "adi":
                             slides = pptPresentation.Slides;
                             slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
+                            break;
+
+                        case "rem":
+                            slides = pptPresentation.Slides;
+                            slides[index].Delete();
+                            index--;
+                            break;
+
+                        case "grdrppt":
+                            pptPresentation.SaveAs("temp", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
+                            break;
+
+                        case "grdrpdf":
+                            pptPresentation.SaveAs("temp", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsPDF, MsoTriState.msoTrue);
                             break;
                     }
                 }
@@ -223,17 +233,24 @@ namespace speechModality
                             default:
                                 tts.Speak("Por favor use o comando 'Powerpoint abrir' para iniciar a aplicação");
                                 break;
-                            //case "adi":
-                            //    Slides slides = pptPresentation.Slides;
-                            //    slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
-                            //    break;
                         }
                     }
 
                     if (wake.Equals("ppt") && command.Equals(""))
                     {
-                        tts.Speak("Sim?");
-                        WOKE = true;
+                        try{
+                            tts.Speak("Sim?");
+                            OPENED = true;
+                            WOKE = true;
+                            PPTAPP.Visible = MsoTriState.msoTrue;
+                            Presentations ppPresens = PPTAPP.Presentations;
+                            pptPresentation = ppPresens.Open("temp", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
+                        }
+                        catch (System.IO.FileNotFoundException)
+                        {
+                            pptPresentation = PPTAPP.Presentations.Add(MsoTriState.msoTrue);
+                        }
+                       
                     }
                 }
                 else
@@ -316,6 +333,20 @@ namespace speechModality
                                 slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
                                 break;
 
+                            case "rem":
+                                slides = pptPresentation.Slides;
+                                slides[index].Delete();
+                                index--;
+                                break;
+
+                            case "grdrppt":
+                                pptPresentation.SaveAs("temp", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
+                                break;
+
+                            case "grdrpdf":
+                                pptPresentation.SaveAs("temp", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsPDF, MsoTriState.msoTrue);
+                                break;
+
                             default:
                                 tts.Speak("Por favor use o comando 'Powerpoint abrir' para iniciar a aplicação");
                                 break;
@@ -324,70 +355,6 @@ namespace speechModality
                     }
                 }
             }
-
-            
-            
-
-            //if (e.Result.Semantics.ContainsKey("open")) {
-            //    try
-            //    {
-            //        PPTAPP.Visible = MsoTriState.msoTrue;
-            //        Presentations ppPresens = PPTAPP.Presentations;
-            //        pptPresentation = ppPresens.Open("temp", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
-            //    }
-            //    catch (System.IO.FileNotFoundException)
-            //    {
-            //        pptPresentation = PPTAPP.Presentations.Add(MsoTriState.msoTrue);
-            //        //pptPresentation.SaveAs(@"temp", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsDefault, MsoTriState.msoTrue);
-            //    }
-            //}
-
-            //if (e.Result.Semantics.ContainsKey("command")) {
-            //    switch (e.Result.Semantics["command"].Value.ToString())
-            //    {
-            //        case "avn":
-            //            tts.Speak("Avançar Slide");
-
-            //            //if (pptPresentation == null)
-            //            //{
-            //            //    try
-            //            //    {
-            //            //        var col = PPTAPP.Presentations.GetEnumerator();
-
-            //            //        while (pptPresentation == null) {
-            //            //            pptPresentation = (Presentation)col.Current;
-            //            //            col.MoveNext();
-            //            //        }
-            //            //      }
-            //            //    catch
-            //            //    {
-
-            //            //    }
-            //            //}
-
-            //            //try
-            //            //{
-            //            //    SlideShowWindow slides = pptPresentation.SlideShowWindow;
-
-            //            //}
-            //            //catch(System.Runtime.InteropServices.COMException)
-            //            //{
-            //            //    tts.Speak("A apresentação não tem mais slides");
-            //            //}
-            //            break;
-
-            //        case "rec":
-            //            tts.Speak("Recuar Slide");
-            //            break;
-
-            //        case "ppt":
-            //            tts.Speak("Sim?");
-            //            break;
-            //    }
-            //}
-
-
-
         }
     }
 }
