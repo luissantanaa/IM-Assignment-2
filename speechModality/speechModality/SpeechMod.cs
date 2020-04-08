@@ -186,6 +186,22 @@ namespace speechModality
                         case "grdrpdf":
                             pptPresentation.SaveAs("temp", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsPDF, MsoTriState.msoTrue);
                             break;
+
+                        case "lnts":
+                            Slide s = slides[index]; //ir buscar slide em que esta
+                            if(s.HasNotesPage == MsoTriState.msoFalse)
+                            {
+                                tts.Speak("O diapositivo não tem notas");
+                            }
+                            else
+                            {
+                                Microsoft.Office.Interop.PowerPoint.Shapes shp = s.NotesPage.Shapes;
+                                foreach(var sh in shp)
+                                {
+                                    tts.Speak(sh.ToString());
+                                }
+                            }
+                            break;
                     }
                 }
                 else if (!(OPENED) && WOKE)
