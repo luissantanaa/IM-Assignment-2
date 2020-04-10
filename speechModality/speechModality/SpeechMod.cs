@@ -90,7 +90,13 @@ namespace speechModality
             else
             {
                 var wake = e.Result.Semantics.First().Value.Value;
-                var command = e.Result.Semantics.Last().Value.Value;
+                var command = (String) e.Result.Semantics.Last().Value.Value;
+
+                string[] split = command.Split(':');
+
+                command = split[0];
+                var slideNumber = split[1];
+
                 Console.WriteLine(wake);
                 Console.WriteLine(command);
 
@@ -121,6 +127,20 @@ namespace speechModality
                                 pptPresentation.SlideShowSettings.Run();
                                 objSlideShowView = pptPresentation.SlideShowWindow.View;
                                 objSlideShowView.Application.SlideShowWindows[1].Activate();
+                            }
+
+                            break;
+
+                        case "salt":
+
+                            slides = pptPresentation.Slides;
+                            try
+                            {
+                                slides[Int32.Parse(slideNumber)].Select();
+                            }
+                            catch
+                            {
+                                tts.Speak("Desculpe, não é possivel avançar para o diapositivo " +slideNumber);
                             }
 
                             break;
