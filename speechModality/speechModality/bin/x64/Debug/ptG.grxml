@@ -1,33 +1,4 @@
 ﻿<?xml version="1.0"?>
-<!--<grammar xml:lang="pt-PT" version="1.0" xmlns="http://www.w3.org/2001/06/grammar" tag-format="semantics/1.0">
-	<rule id="rootRule" scope="public">
-	  <item>
-		  <item>
-			<ruleref uri="#object"/>
-			<tag>out.shape=rules.latest();</tag>
-		  </item>
-		  <item>
-			<ruleref uri="#color"/>
-			<tag>out.color=rules.latest();</tag>
-		  </item>
-	  </item>
-	</rule>
-	<rule id="object">
-	  <one-of>
-		<item>quadrado<tag>out="SQUARE"</tag></item>
-		<item>círculo<tag>out="CIRCLE"</tag></item>
-		<item>triângulo<tag>out="TRIANGLE"</tag></item>
-	  </one-of>
-	</rule>
-	<rule id="color">
-	  <one-of>
-		<item>verde<tag>out="GREEN"</tag></item>
-		<item>azul<tag>out="BLUE"</tag></item>
-		<item>vermelho<tag>out="RED"</tag></item>
-	  </one-of>
-	</rule>
-</grammar>-->
-
 <grammar xml:lang="pt-PT" version="1.0" xmlns="http://www.w3.org/2001/06/grammar" tag-format="semantics/1.0">
 	<rule id="rootRule" scope="public">
 		<item>
@@ -65,16 +36,15 @@
 				<item repeat="0-1">apresentação</item>
 			</item>
 
-      <item>
+      <item><tag>out="grdrppt"</tag>
         <item>
           <one-of>
-            <item>guardar<tag>out="grdrppt"</tag></item>
-            <item>salvar<tag>out="grdrppt"</tag></item>
-            <item>gravar<tag>out="grdrppt"</tag></item>
+            <item>guardar</item>
+            <item>salvar</item>
+            <item>gravar</item>
           </one-of>
         </item>
-        <item repeat="0-1">em powerpoint<tag>out="grdrppt"</tag></item>
-        <item repeat="0-1">em pdf<tag>out="grdrpdf"</tag></item>
+        <item repeat="0-1">em powerpoint</item>
       </item>
       
       <item><tag>out="nAprest"</tag>
@@ -222,6 +192,7 @@
 				</item>
 				<item>
 					<ruleref uri="#number"/>
+          <tag> out="salt:" + rules.latest();</tag>
 				</item>
 			</item>
 
@@ -249,7 +220,7 @@
 				<item repeat="0-1">numero</item>
 				<item repeat="0-1">
 					<ruleref uri="#number"/>
-				</item>
+        </item>
 			</item>
 
 			<item>

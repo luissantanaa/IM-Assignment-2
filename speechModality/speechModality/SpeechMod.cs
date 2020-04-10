@@ -24,6 +24,7 @@ namespace speechModality
         private Boolean OPENED = false;
         private int index = 1;
         private SlideShowView objSlideShowView;
+        private String slideNumber;
 
         public event EventHandler<SpeechEventArg> Recognized;
         protected virtual void onRecognized(SpeechEventArg msg)
@@ -95,8 +96,14 @@ namespace speechModality
                 string[] split = command.Split(':');
 
                 command = split[0];
-                var slideNumber = split[1];
-
+                try { 
+                    slideNumber = split[1];
+                    Console.WriteLine("sl " + slideNumber);
+                }
+                catch
+                {
+                    slideNumber = "";
+                }
                 Console.WriteLine(wake);
                 Console.WriteLine(command);
 
