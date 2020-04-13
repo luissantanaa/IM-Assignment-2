@@ -195,8 +195,8 @@
 			</item>
 
 			<item>
-        <tag> out="nots:" + rules.latest();</tag>
 				<item>
+          <tag> out="nots:"</tag>
 					<one-of>
 						<item>lê</item>
 						<item>ler</item>
@@ -219,6 +219,7 @@
 				<item repeat="0-1">numero</item>
 				<item repeat="0-1">
 					<ruleref uri="#number"/>
+          <tag> out="nots:" +  rules.latest();</tag>
         </item>
 			</item>
 

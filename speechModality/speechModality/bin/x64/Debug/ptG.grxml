@@ -73,15 +73,13 @@
 				
 				<item>
 					<ruleref uri="#number"/>
-					<tag>out.number=rules.latest();</tag>
-				</item>
+          <tag> out="limit:" + rules.latest();</tag>
+        </item>
 				
         <item>
 					<one-of>
-						<item>minuto<tag>out="lim"</tag></item>
-						<item>minutos<tag>out="lim"</tag></item>
-						<item>hora<tag>out="lim"</tag></item>
-						<item>horas<tag>out="lim"</tag></item>
+						<item>minuto</item>
+						<item>minutos</item>
 					</one-of>
 				</item>
 			</item>
@@ -198,6 +196,7 @@
 
 			<item>
 				<item>
+          <tag> out="nots:"</tag>
 					<one-of>
 						<item>lê</item>
 						<item>ler</item>
@@ -220,10 +219,12 @@
 				<item repeat="0-1">numero</item>
 				<item repeat="0-1">
 					<ruleref uri="#number"/>
+          <tag> out="nots:" +  rules.latest();</tag>
         </item>
 			</item>
 
 			<item>
+        <tag>out="acab"</tag>
 				<item>
 					<one-of>
 						<item>acabar</item>

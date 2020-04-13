@@ -10,7 +10,7 @@ using Microsoft.Office.Interop.PowerPoint;
 using Microsoft.Office.Core;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
-
+using System.Timers;
 namespace speechModality
 {
     public class SpeechMod
@@ -27,8 +27,8 @@ namespace speechModality
         private SlideShowView objSlideShowView;
         private String intpart;
         private int slideTimeLimit;
-        private int time = 0; // class scope
-
+        private static System.Timers.Timer timer;
+        private static int min = 60000;
 
         public event EventHandler<SpeechEventArg> Recognized;
         protected virtual void onRecognized(SpeechEventArg msg)
@@ -57,7 +57,7 @@ namespace speechModality
             gr = new Grammar(Environment.CurrentDirectory + "\\ptG.grxml", "rootRule");
             sre.LoadGrammar(gr);
 
-            
+           
             sre.SetInputToDefaultAudioDevice();
             sre.RecognizeAsync(RecognizeMode.Multiple);
             sre.SpeechRecognized += Sre_SpeechRecognized;
@@ -72,7 +72,7 @@ namespace speechModality
 
         private void Sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            int ID;
+            
             onRecognized(new SpeechEventArg(){Text = e.Result.Text, Confidence = e.Result.Confidence, Final = true});
             
             //SEND
@@ -90,7 +90,9 @@ namespace speechModality
 
             if (e.Result.Confidence < 0.5)
             {
+                
                 tts.Speak("Desculpe, não percebi. Por favor repita");
+            
             }
             else
             {
@@ -160,7 +162,7 @@ namespace speechModality
                             }
                             catch
                             {
-                                tts.Speak("Desculpe, não é possivel avançar para o diapositivo " + intpart);
+                                tts.Speak("Desculpe, não é possivel ler notas do diapositivo " + intpart);
                             }
 
                             break;
@@ -183,7 +185,13 @@ namespace speechModality
 
                             try
                             {
+                                
                                 slideTimeLimit = Int32.Parse(intpart);
+                                Console.WriteLine(slideTimeLimit);
+                                Console.WriteLine(slideTimeLimit*min);
+                                timer = new System.Timers.Timer(slideTimeLimit*min);
+                                timer.Elapsed += OnTimedEvent;
+                                timer.Enabled = true;
                                 tts.Speak("Limite de " +intpart+ " minutos definido");
 
                             }
@@ -224,18 +232,6 @@ namespace speechModality
                             }
                             break;
 
-                        case "abr":
-                            try
-                            {
-                                PPTAPP.Visible = MsoTriState.msoTrue;
-                                Presentations ppPresens = PPTAPP.Presentations;
-                                pptPresentation = ppPresens.Open("temp", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
-                            }
-                            catch (System.IO.FileNotFoundException)
-                            {
-                                pptPresentation = PPTAPP.Presentations.Add(MsoTriState.msoTrue);
-                            }
-                            break;
 
                         case "acab":
 
@@ -250,14 +246,30 @@ namespace speechModality
                             break;
 
                         case "adi":
-                            slides = pptPresentation.Slides;
-                            slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
+                            try
+                            {
+                                slides = pptPresentation.Slides;
+                                slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
+                            }
+                            catch
+                            {
+                                tts.Speak("Desculpe, não é possível adicionar slide");
+                            }
+                            
                             break;
 
                         case "rem":
-                            slides = pptPresentation.Slides;
-                            slides[index].Delete();
-                            index--;
+                            try
+                            {
+                                slides = pptPresentation.Slides;
+                                slides[index].Delete();
+                                index--;
+                            }
+                            catch
+                            {
+                                tts.Speak("Desculpe, não é possível remover slide");
+                            }
+                            
                             break;
 
                         case "grdrppt":
@@ -268,21 +280,7 @@ namespace speechModality
                             pptPresentation.SaveAs("temp", Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType.ppSaveAsPDF, MsoTriState.msoTrue);
                             break;
 
-                        case "lnts":
-                            Slide s = slides[index]; //ir buscar slide em que esta
-                            if(s.HasNotesPage == MsoTriState.msoFalse)
-                            {
-                                tts.Speak("O diapositivo não tem notas");
-                            }
-                            else
-                            {
-                                Microsoft.Office.Interop.PowerPoint.Shapes shp = s.NotesPage.Shapes;
-                                foreach(var sh in shp)
-                                {
-                                    tts.Speak(sh.ToString());
-                                }
-                            }
-                            break;
+                       
                     }
                 }
                 else if (!(OPENED) && WOKE)
@@ -358,7 +356,9 @@ namespace speechModality
                         {
 
                             case "nAprest":
-                                if (!(PPTAPP.SlideShowWindows.Count > 0)) {
+
+                                if (!(PPTAPP.SlideShowWindows.Count > 0))
+                                {
                                     tts.Speak("De momento não esta no modo de apresentação");
                                 }
                                 else
@@ -367,7 +367,8 @@ namespace speechModality
                                 }
                                 break;
                             case "aprest":
-                                if (slides == null)
+
+                                if (slides.Count.Equals(0))
                                 {
                                     tts.Speak("A apresentação tem que ter pelo menos um slide");
                                 }
@@ -378,11 +379,67 @@ namespace speechModality
                                     objSlideShowView = pptPresentation.SlideShowWindow.View;
                                     objSlideShowView.Application.SlideShowWindows[1].Activate();
                                 }
-                               
+
+                                break;
+
+                            case "nots":
+                                try
+                                {
+                                    slides = pptPresentation.Slides;
+                                    if (intpart == "")
+                                    {
+                                        var slide = slides[index];
+                                        tts.Speak(slide.NotesPage.Shapes[2].TextFrame.TextRange.Text);
+                                    }
+                                    else
+                                    {
+                                        var slide = slides[Int32.Parse(intpart)];
+                                        tts.Speak(slide.NotesPage.Shapes[2].TextFrame.TextRange.Text);
+                                    }
+                                }
+                                catch
+                                {
+                                    tts.Speak("Desculpe, não é possivel ler notas do diapositivo " + intpart);
+                                }
+
+                                break;
+
+                            case "salt":
+
+                                slides = pptPresentation.Slides;
+                                try
+                                {
+                                    slides[Int32.Parse(intpart)].Select();
+                                }
+                                catch
+                                {
+                                    tts.Speak("Desculpe, não é possivel avançar para o diapositivo " + intpart);
+                                }
+
+                                break;
+
+                            case "limit":
+
+                                try
+                                {
+                                    slideTimeLimit = Int32.Parse(intpart);
+                                    Console.WriteLine(slideTimeLimit);
+                                    Console.WriteLine(slideTimeLimit * min);
+                                    timer = new System.Timers.Timer(slideTimeLimit * min);
+                                    timer.Elapsed += OnTimedEvent;
+                                    timer.Enabled = true;
+                                    tts.Speak("Limite de " + intpart + " minutos definido");
+
+                                }
+                                catch
+                                {
+                                    tts.Speak("Desculpe, não é possivel definir limite");
+                                }
+
                                 break;
 
                             case "avn":
-                               
+
                                 slides = pptPresentation.Slides;
                                 try
                                 {
@@ -411,29 +468,44 @@ namespace speechModality
                                 }
                                 break;
 
-                            case "abr":
+
+                            case "acab":
+
                                 try
                                 {
-                                    OPENED = true;
-                                    PPTAPP.Visible = MsoTriState.msoTrue;
-                                    Presentations ppPresens = PPTAPP.Presentations;
-                                    pptPresentation = ppPresens.Open("temp", MsoTriState.msoFalse, MsoTriState.msoTrue, MsoTriState.msoTrue);
+                                    pptPresentation.Close();
                                 }
-                                catch (System.IO.FileNotFoundException)
+                                catch
                                 {
-                                    pptPresentation = PPTAPP.Presentations.Add(MsoTriState.msoTrue);
+                                    tts.Speak("Desculpe, não é possível terminar a apresentação");
                                 }
                                 break;
 
                             case "adi":
-                                slides = pptPresentation.Slides;
-                                slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
+                                try
+                                {
+                                    slides = pptPresentation.Slides;
+                                    slides.Add(pptPresentation.Slides.Count + 1, Microsoft.Office.Interop.PowerPoint.PpSlideLayout.ppLayoutTitleOnly);
+                                }
+                                catch
+                                {
+                                    tts.Speak("Desculpe, não é possível adicionar slide");
+                                }
+
                                 break;
 
                             case "rem":
-                                slides = pptPresentation.Slides;
-                                slides[index].Delete();
-                                index--;
+                                try
+                                {
+                                    slides = pptPresentation.Slides;
+                                    slides[index].Delete();
+                                    index--;
+                                }
+                                catch
+                                {
+                                    tts.Speak("Desculpe, não é possível remover slide");
+                                }
+
                                 break;
 
                             case "grdrppt":
@@ -453,5 +525,12 @@ namespace speechModality
                 }
             }
         }
+        private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            Console.WriteLine("Ola");
+            Tts tts = new Tts();
+            tts.Speak("O tempo da apresentação acabou");
+        }
     }
+   
 }
