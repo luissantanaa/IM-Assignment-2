@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,10 @@ namespace speechModality
         private Boolean OPENED = false;
         private int index = 1;
         private SlideShowView objSlideShowView;
-        private String slideNumber;
+        private String intpart;
+        private int slideTimeLimit;
+        private int time = 0; // class scope
+
 
         public event EventHandler<SpeechEventArg> Recognized;
         protected virtual void onRecognized(SpeechEventArg msg)
@@ -93,16 +97,17 @@ namespace speechModality
                 var wake = e.Result.Semantics.First().Value.Value;
                 var command = (String) e.Result.Semantics.Last().Value.Value;
 
+
                 string[] split = command.Split(':');
 
                 command = split[0];
                 try { 
-                    slideNumber = split[1];
-                    Console.WriteLine("sl " + slideNumber);
+                    intpart = split[1];
+                    Console.WriteLine("sl " + intpart);
                 }
                 catch
                 {
-                    slideNumber = "";
+                    intpart = "";
                 }
                 Console.WriteLine(wake);
                 Console.WriteLine(command);
@@ -138,16 +143,53 @@ namespace speechModality
 
                             break;
 
+                        case "nots":
+                            try
+                            {
+                                slides = pptPresentation.Slides;
+                                if (intpart == "")
+                                {
+                                    var slide = slides[index];
+                                    tts.Speak(slide.NotesPage.Shapes[2].TextFrame.TextRange.Text);
+                                }
+                                else
+                                {
+                                    var slide = slides[Int32.Parse(intpart)];
+                                    tts.Speak(slide.NotesPage.Shapes[2].TextFrame.TextRange.Text);
+                                }
+                            }
+                            catch
+                            {
+                                tts.Speak("Desculpe, não é possivel avançar para o diapositivo " + intpart);
+                            }
+
+                            break;
+
                         case "salt":
 
                             slides = pptPresentation.Slides;
                             try
                             {
-                                slides[Int32.Parse(slideNumber)].Select();
+                                slides[Int32.Parse(intpart)].Select();
                             }
                             catch
                             {
-                                tts.Speak("Desculpe, não é possivel avançar para o diapositivo " +slideNumber);
+                                tts.Speak("Desculpe, não é possivel avançar para o diapositivo " + intpart);
+                            }
+
+                            break;
+
+                        case "limit":
+
+                            try
+                            {
+                                slideTimeLimit = Int32.Parse(intpart);
+                                tts.Speak("Limite de " +intpart+ " minutos definido");
+
+                            }
+                            catch
+                            {
+                                tts.Speak("Desculpe, não é possivel definir limite" );
                             }
 
                             break;
@@ -192,6 +234,18 @@ namespace speechModality
                             catch (System.IO.FileNotFoundException)
                             {
                                 pptPresentation = PPTAPP.Presentations.Add(MsoTriState.msoTrue);
+                            }
+                            break;
+
+                        case "acab":
+
+                            try
+                            {
+                                pptPresentation.Close();
+                            }
+                            catch
+                            {
+                                tts.Speak("Desculpe, não é possível terminar a apresentação");
                             }
                             break;
 
