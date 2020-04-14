@@ -27,7 +27,7 @@ namespace speechModality
         private SlideShowView objSlideShowView;
         private String intpart;
         private int slideTimeLimit;
-        private static System.Timers.Timer timer;
+        private static System.Timers.Timer timer = null;
         private static int min = 60000;
 
         public event EventHandler<SpeechEventArg> Recognized;
@@ -363,6 +363,7 @@ namespace speechModality
                                 }
                                 else
                                 {
+                                    timer.Stop();
                                     objSlideShowView.Exit();
                                 }
                                 break;
@@ -422,7 +423,7 @@ namespace speechModality
 
                                 try
                                 {
-                                    slideTimeLimit = Int32.Parse(intpart);
+                                    slideTimeLimit = Int32.Parse(intpart)/slides.Count;
                                     Console.WriteLine(slideTimeLimit);
                                     Console.WriteLine(slideTimeLimit * min);
                                     timer = new System.Timers.Timer(slideTimeLimit * min);
@@ -443,6 +444,19 @@ namespace speechModality
                                 slides = pptPresentation.Slides;
                                 try
                                 {
+                                    if(timer != null)
+                                    {
+                                        if (timer.Enabled)
+                                        {
+                                            timer.Stop();
+                                            timer.Start();
+                                        }
+                                        else
+                                        {
+                                            timer.Start();
+                                        }
+                                    }
+
                                     index++;
                                     slides[index].Select();
                                 }
@@ -527,9 +541,10 @@ namespace speechModality
         }
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("Ola");
+            timer.Stop();
+            timer.Enabled = false;
             Tts tts = new Tts();
-            tts.Speak("O tempo da apresentação acabou");
+            tts.Speak("O tempo da apresentação por slide esgotou-se");
         }
     }
    
