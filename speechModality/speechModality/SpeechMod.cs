@@ -26,8 +26,9 @@ namespace speechModality
         private int index = 1;
         private SlideShowView objSlideShowView;
         private String intpart;
-        private int slideTimeLimit;
-        private static System.Timers.Timer timer = null;
+        private double slideTimeLimit;
+        private static System.Timers.Timer timerPerSlide = null;
+        private static System.Timers.Timer timerFull = null;
         private static int min = 60000;
 
         public event EventHandler<SpeechEventArg> Recognized;
@@ -88,13 +89,14 @@ namespace speechModality
             var exNot = lce.ExtensionNotification(e.Result.Audio.StartTime+"", e.Result.Audio.StartTime.Add(e.Result.Audio.Duration)+"",e.Result.Confidence, json);
             mmic.Send(exNot);
 
-            if (e.Result.Confidence < 0.5)
+            if (e.Result.Confidence < 0.5 && e.Result.Confidence >= 0.2)
             {
                 
                 tts.Speak("Desculpe, não percebi. Por favor repita");
             
+
             }
-            else
+            else if (e.Result.Confidence >= 0.5)
             {
                 var wake = e.Result.Semantics.First().Value.Value;
                 var command = (String) e.Result.Semantics.Last().Value.Value;
@@ -185,13 +187,20 @@ namespace speechModality
 
                             try
                             {
-                                
+                                slides = pptPresentation.Slides;
+                                int size = slides.Count;
                                 slideTimeLimit = Int32.Parse(intpart);
                                 Console.WriteLine(slideTimeLimit);
                                 Console.WriteLine(slideTimeLimit*min);
-                                timer = new System.Timers.Timer(slideTimeLimit*min);
-                                timer.Elapsed += OnTimedEvent;
-                                timer.Enabled = true;
+
+                                double timePerSlide = slideTimeLimit / size;
+                                timerFull = new System.Timers.Timer(slideTimeLimit * min);
+                                timerFull.Elapsed += OnTimedEventFull;
+                                timerFull.Enabled = true;
+                                
+                                timerPerSlide = new System.Timers.Timer(timePerSlide* min);
+                                timerPerSlide.Elapsed += OnTimedEvent;
+                                timerPerSlide.Enabled = true;
                                 tts.Speak("Limite de " +intpart+ " minutos definido");
 
                             }
@@ -205,10 +214,23 @@ namespace speechModality
                         case "avn":
                            
                             slides = pptPresentation.Slides;
+                            
                             try
                             {
                                 index++;
                                 slides[index].Select();
+                                if (timerPerSlide != null)
+                                {
+                                    if (timerPerSlide.Enabled)
+                                    {
+                                        timerPerSlide.Stop();
+                                        timerPerSlide.Start();
+                                    }
+                                    else
+                                    {
+                                        timerPerSlide.Start();
+                                    }
+                                }
                             }
                             catch
                             {
@@ -363,7 +385,6 @@ namespace speechModality
                                 }
                                 else
                                 {
-                                    timer.Stop();
                                     objSlideShowView.Exit();
                                 }
                                 break;
@@ -423,12 +444,20 @@ namespace speechModality
 
                                 try
                                 {
-                                    slideTimeLimit = Int32.Parse(intpart)/slides.Count;
+                                    slides = pptPresentation.Slides;
+                                    int size = slides.Count;
+                                    slideTimeLimit = Int32.Parse(intpart);
                                     Console.WriteLine(slideTimeLimit);
                                     Console.WriteLine(slideTimeLimit * min);
-                                    timer = new System.Timers.Timer(slideTimeLimit * min);
-                                    timer.Elapsed += OnTimedEvent;
-                                    timer.Enabled = true;
+
+                                    double timePerSlide = slideTimeLimit / size;
+                                    timerFull = new System.Timers.Timer(slideTimeLimit * min);
+                                    timerFull.Elapsed += OnTimedEventFull;
+                                    timerFull.Enabled = true;
+
+                                    timerPerSlide = new System.Timers.Timer(timePerSlide * min);
+                                    timerPerSlide.Elapsed += OnTimedEvent;
+                                    timerPerSlide.Enabled = true;
                                     tts.Speak("Limite de " + intpart + " minutos definido");
 
                                 }
@@ -442,23 +471,23 @@ namespace speechModality
                             case "avn":
 
                                 slides = pptPresentation.Slides;
+
                                 try
                                 {
-                                    if(timer != null)
+                                    index++;
+                                    slides[index].Select();
+                                    if (timerPerSlide != null)
                                     {
-                                        if (timer.Enabled)
+                                        if (timerPerSlide.Enabled)
                                         {
-                                            timer.Stop();
-                                            timer.Start();
+                                            timerPerSlide.Stop();
+                                            timerPerSlide.Start();
                                         }
                                         else
                                         {
-                                            timer.Start();
+                                            timerPerSlide.Start();
                                         }
                                     }
-
-                                    index++;
-                                    slides[index].Select();
                                 }
                                 catch
                                 {
@@ -539,10 +568,19 @@ namespace speechModality
                 }
             }
         }
+
+        private void OnTimedEventFull(object sender, ElapsedEventArgs e)
+        {
+            timerFull.Stop();
+            timerFull.Enabled = false;
+            Tts tts = new Tts();
+            tts.Speak("O tempo da apresentação esgotou-se");
+        }
+
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            timer.Stop();
-            timer.Enabled = false;
+            timerPerSlide.Stop();
+            timerPerSlide.Enabled = false;
             Tts tts = new Tts();
             tts.Speak("O tempo da apresentação por slide esgotou-se");
         }
