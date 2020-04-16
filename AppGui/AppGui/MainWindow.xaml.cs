@@ -211,8 +211,18 @@ namespace AppGui
 
                             try
                             {
-                                index++;
-                                slides[index].Select();
+                                if (!(PPTAPP.SlideShowWindows.Count > 0))
+                                {
+                                    index++;
+                                    slides[index].Select();
+                                }
+                                else
+                                {
+                                    index++;
+                                    pptPresentation.SlideShowWindow.View.Next();
+                                }
+
+                                
                                 if (timerPerSlide != null)
                                 {
                                     if (timerPerSlide.Enabled)
@@ -242,9 +252,16 @@ namespace AppGui
                             slides = pptPresentation.Slides;
                             try
                             {
-                                index--;
-                                slides[index].Select();
-                                //restartSre();
+                                if (!(PPTAPP.SlideShowWindows.Count > 0))
+                                {
+                                    index--;
+                                    slides[index].Select();
+                                }
+                                else
+                                {
+                                    index--;
+                                    pptPresentation.SlideShowWindow.View.Previous();
+                                }
                             }
                             catch
                             {
