@@ -6,9 +6,7 @@ using System.Text;
 using System.Media;
 using Microsoft.Speech.Synthesis;
 using Microsoft.Speech.AudioFormat;
-
-
-
+using Microsoft.Speech.Recognition;
 
 namespace speechModality
 {
@@ -16,14 +14,14 @@ namespace speechModality
     {
         SpeechSynthesizer tts = null;
         static SoundPlayer player = new SoundPlayer();
-
+        SpeechRecognitionEngine sre;
         /*
          * Text to Speech
          */
-        public Tts()
+        public Tts(SpeechRecognitionEngine sre)
         {
 
-
+            this.sre = sre;
             Console.WriteLine("TTS constructor called");
 
             
@@ -101,6 +99,17 @@ namespace speechModality
          * 
          * @param text - text to convert
          */
+
+        public Boolean getStreamState() {
+            if (player.Stream == null) {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public void Speak(string text)
         {
             while (player.Stream != null) { 
@@ -110,6 +119,7 @@ namespace speechModality
             //create audio stream with speech
             player.Stream = new System.IO.MemoryStream();
             tts.SetOutputToWaveStream(player.Stream);
+            sre.RecognizeAsyncCancel();
             tts.SpeakAsync(text);
         }
 
@@ -133,6 +143,7 @@ namespace speechModality
 
             Console.WriteLine("... calling  SpeakSsmlAsync()");
 
+            sre.RecognizeAsyncCancel();
             tts.SpeakSsmlAsync(text);
 
             Console.WriteLine("done  SpeakSsmlAsync().\n");
@@ -151,6 +162,8 @@ namespace speechModality
                 player.Play();
                 player.Stream = null;  //  NEW 2015
             }
+            //sre.SetInputToDefaultAudioDevice();
+            sre.RecognizeAsync(RecognizeMode.Multiple);
         }
     }
 }

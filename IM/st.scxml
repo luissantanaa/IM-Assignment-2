@@ -79,7 +79,14 @@
 					</if>
 				
 					-->
-				
+					<if cond="${_eventdata.sourceMC eq 'GUI'}">
+						<assign name="currAction" expr="command" />
+						<assign name="Action" expr="${_eventdata.data}" />
+						<commons:var name="startRequest" expr="${mmi:newStartRequest(contextId, source, 'ASR', mmi:newRequestId(contextId), currAction, Action)}" />
+						<send event="mmi:startRequest" target="ASR" targettype="MC" namelist="startRequest" />
+
+					</if>
+
 					<if cond="${_eventdata.sourceMC eq 'APP'}">
 						<assign name="Action" expr="${_eventdata.data}" />
 						<commons:var name="startRequest" expr="${mmi:newStartRequest(contextId, source, 'TTS', mmi:newRequestId(contextId), 'READ', Action)}" />
